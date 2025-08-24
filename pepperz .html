@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>🌶️ Pepperz - Fresh Homemade Food</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link rel="manifest" href="#manifest"> <!-- For PWA -->
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background: #f5f5f5;
+      color: #333;
+      min-height: 100vh;
+    }
+
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      background: white;
+      min-height: 100vh;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    header {
+      background: #d32f2f;
+      color: white;
+      padding: 15px 20px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+    }
+
+    header p {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    .screen {
+      display: none;
+      padding: 20px;
+    }
+
+    .active {
+      display: block;
+    }
+
+    .btn {
+      background: #d32f2f;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 1rem;
+      width: 100%;
+      margin: 15px 0;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background: #b71c1c;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 1rem;
+    }
+
+    /* OTP Screen */
+    .otp-inputs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .otp-input {
+      width: 50px;
+      height: 50px;
+      text-align: center;
+      font-size: 1.2rem;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+    }
+
+    /* Menu */
+    .category h2 {
+      font-size: 1.3rem;
+      color: #d32f2f;
+      margin: 30px 0 15px;
+      display: flex;
+      align-items: center;
+    }
+
+    .category h2 i {
+      margin-right: 10px;
+    }
+
+    .items {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .item {
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      background: #fff;
+    }
+
+    .item img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+    }
+
+    .item-info {
+      padding: 10px;
+    }
+
+    .item-info h3 {
+      font-size: 0.95rem;
+      color: #333;
+    }
+
+    .item-info .price {
+      color: #d32f2f;
+      font-weight: bold;
+      margin: 5px 0;
+    }
+
+    .qty-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .qty-btn button {
+      width: 30px;
+      height: 30px;
+      border: none;
+      background: #f1f1f1;
+      border-radius: 50%;
+      font-size: 1.2rem;
+    }
+
+    /* Cart */
+    .cart-icon {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      background: #d32f2f;
+      color: white;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      z-index: 100;
+    }
+
+    .cart-modal {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: white;
+      border-radius: 20px 20px 0 0;
+      padding: 20px;
+      box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+      transform: translateY(100%);
+      transition: 0.4s;
+      z-index: 200;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    .cart-modal.active {
+      transform: translateY(0);
+    }
+
+    .cart-item {
+      display: flex;
+      margin: 10px 0;
+      align-items: center;
+    }
+
+    .cart-item img {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      object-fit: cover;
+      margin-right: 10px;
+    }
+
+    .cart-item .qty {
+      width: 40px;
+      text-align: center;
+      margin: 0 5px;
+    }
+
+    .close-cart {
+      text-align: center;
+      margin: 10px 0;
+      color: #888;
+      font-size: 0.9rem;
+    }
+
+    /* Order Summary */
+    .order-summary {
+      line-height: 2;
+    }
+
+    .order-summary b {
+      color: #d32f2f;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app">
+
+    <!-- Login Screen -->
+    <div class="screen active" id="login-screen">
+      <header><h1>🌶️ Pepperz</h1><p>Homemade in 20 Min</p></header>
+      <div style="padding: 40px 20px; text-align: center;">
+        <h2>👋 Welcome to Pepperz</h2>
+        <p>Login to order fresh food made at home</p>
+        <input type="text" id="phone-email" placeholder="Phone or Email" />
+        <button class="btn" onclick="sendOTP()">Send OTP</button>
+      </div>
+    </div>
+
+    <!-- OTP Screen -->
+    <div class="screen" id="otp-screen">
+      <header><h1>🔐 OTP</h1><p>Enter 6-digit code</p></header>
+      <div style="padding: 40px 20px;">
+        <p>We sent an OTP to <b id="otp-to"></b></p>
+        <div class="otp-inputs">
+          <input type="text" class="otp-input" maxlength="1" oninput="moveToNext(this, 1)">
+          <input type="text" class="otp-input" maxlength="1" oninput="moveToNext(this, 2)">
+          <input type="text" class="otp-input" maxlength="1" oninput="moveToNext(this, 3)">
+          <input type="text" class="otp-input" maxlength="1" oninput="moveToNext(this, 4)">
+          <input type="text" class="otp-input" maxlength="1" oninput="moveToNext(this, 5)">
+          <input type="text" class="otp-input" maxlength="1" oninput="verifyOTP()">
+        </div>
+        <button class="btn" onclick="verifyOTP()">Verify & Continue</button>
+      </div>
+    </div>
+
+    <!-- Menu Screen -->
+    <div class="screen" id="menu-screen">
+      <header><h1>🌶️ Pepperz</h1><p>Ready in 20 mins</p></header>
+      <div id="menu-content"></div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div class="cart-icon" onclick="toggleCart()">
+      <i class="fas fa-shopping-cart"></i>
+      <span id="cart-count" style="position: absolute; top: -5px; right: -5px; background: white; color: #d32f2f; font-size: 0.7rem; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">0</span>
+    </div>
+
+    <div class="cart-modal" id="cart-modal">
+      <h3>🛒 Your Order</h3>
+      <div id="cart-items"></div>
+      <div class="total">Total: ₹<span id="total">0</span></div>
+      <button class="btn" onclick="showAddress()">Proceed to Checkout</button>
+      <p class="close-cart" onclick="toggleCart()">Continue Shopping</p>
+    </div>
+
+    <!-- Address Screen -->
+    <div class="screen" id="address-screen">
+      <header><h1>🏠 Delivery</h1><p>Where to deliver?</p></header>
+      <input type="text" id="name" placeholder="Full Name" />
+      <input type="text" id="address" placeholder="Full Address" />
+      <input type="text" id="landmark" placeholder="Landmark (Optional)" />
+      <select id="area">
+        <option value="">Select Area</option>
+        <option value="Main Market">Main Market</option>
+        <option value="Gol Bazar">Gol Bazar</option>
+        <option value="Station Road">Station Road</option>
+        <option value="New Colony">New Colony</option>
+      </select>
+      <button class="btn" onclick="showPayment()">Continue</button>
+    </div>
+
+    <!-- Payment Screen -->
+    <div class="screen" id="payment-screen">
+      <header><h1>💳 Payment</h1><p>Total: ₹<span id="payment-total">0</span></p></header>
+      <div class="method" onclick="selectMethod(this)">Cash on Delivery</div>
+      <div class="method" onclick="selectMethod(this)">UPI / Online (Demo)</div>
+      <button class="btn" onclick="showOrderSummary()">Confirm Order</button>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="screen" id="order-summary">
+      <header><h1>✅ Order Placed!</h1><p>Order ID: <b id="order-id">PZ-1001</b></p></header>
+      <div class="order-summary" id="summary-details" style="padding: 20px;"></div>
+      <p style="text-align: center; margin: 20px 0;">We'll call you to confirm. Food will be delivered in 20 mins!</p>
+      <button class="btn" onclick="restartApp()">Order Again</button>
+    </div>
+
+  </div>
+
+  <script>
+    const menu = [
+      { cat: "breakfast", item: "Aloo Paratha", price: 40, img: "https://images.unsplash.com/photo-1587314168485-3276d6671610?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400" },
+      { cat: "breakfast", item: "Chole Bhature", price: 80, img: "https://images.unsplash.com/photo-1595295333158-4f7f0a6e61f2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400" },
+      { cat: "breakfast", item: "Idli Sambhar", price: 40, img: "https://images.unsplash.com/photo-1595295333158-4f7f0a6e61f2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400" },
+      { cat: "dal", item: "Dal Tadka", price: 60, img: "https://images.unsplash.com/photo-1559629107-c427cc64336d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400" },
+      { cat: "rice", item: "Jeera Rice", price: 40, img: "https://images.unsplash.com/photo-1606755962773-d324e0a1bc5e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400" },
+      { cat: "sabzi", item: "Paneer Butter Masala", price: 120, img: "https://images.unsplash.com/photo-1571091718767-18b5b1457add?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400" },
+      { cat: "sweet", item: "Jalebi", price: 35, img: "https://images.unsplash.com/photo-1559629107-c427cc64336d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400" },
+      { cat: "fast", item: "Veg Burger", price: 40, img: "https://images.unsplash.com/photo-1571091718767-18b5b1457add?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400" },
+      { cat: "fast", item: "Noodles", price: 50, img: "https://images.unsplash.com/photo-1595295333158-4f7f0a6e61f2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400" },
+    ];
+
+    const categories = {
+      breakfast: { name: "🌅 Breakfast", icon: "🌅" },
+      dal: { name: "🍲 Dal & Kadhi", icon: "🍲" },
+      rice: { name: "🍚 Rice & Pulao", icon: "🍚" },
+      sabzi: { name: "🍛 Sabzi & Curries", icon: "🍛" },
+      sweet: { name: "🍬 Sweets", icon: "🍬" },
+      fast: { name: "🍟 Fast Food", icon: "🍟" }
+    };
+
+    let cart = [];
+    let total = 0;
+    let customer = {};
+
+    function sendOTP() {
+      const input = document.getElementById("phone-email").value;
+      if (!input) {
+        alert("Enter phone or email");
+        return;
+      }
+      customer.contact = input;
+      document.getElementById("otp-to").textContent = input;
+      showScreen("otp-screen");
+      // Simulate OTP sent
+      setTimeout(() => alert("OTP sent! Use any 6 digits."), 500);
+    }
+
+    function moveToNext(el, next) {
+      if (el.value.length === 1 && next < 6) {
+        document.querySelectorAll('.otp-input')[next].focus();
+      }
+    }
+
+    function verifyOTP() {
+      const otp = Array.from(document.querySelectorAll('.otp-input')).map(i => i.value).join('');
+      if (otp.length === 6) {
+        alert("Verified! Welcome to Pepperz.");
+        showMenu();
+      } else {
+        alert("Enter 6-digit OTP");
+      }
+    }
+
+    function showScreen(id) {
+      document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+    }
+
+    function showMenu() {
+      showScreen("menu-screen");
+      loadMenu();
+    }
+
+    function loadMenu() {
+      const menuContent = document.getElementById("menu-content");
+      Object.keys(categories).forEach(catKey => {
+        const catData = categories[catKey];
+        const itemsInCat = menu.filter(item => item.cat === catKey);
+        if (itemsInCat.length === 0) return;
+
+        const catDiv = document.createElement("div");
+        catDiv.classList.add("category");
+        catDiv.innerHTML = `<h2><i>${catData.icon}</i> ${catData.name}</h2><div class="items"></div>`;
+        const itemsDiv = catDiv.querySelector(".items");
+
+        itemsInCat.forEach(item => {
+          const itemEl = document.createElement("div");
+          itemEl.classList.add("item");
+          itemEl.innerHTML = `
+            <img src="${item.img}" alt="${item.item}">
+            <div class="item-info">
+              <h3>${item.item}</h3>
+              <div class="price">₹${item.price}</div>
+              <div class="qty-btn">
+                <button onclick="decreaseCart('${item.item}', ${item.price}, '${item.img}')">−</button>
+                <span id="qty-${item.item.replace(/\s/g, '')}">0</span>
+                <button onclick="addToCart('${item.item}', ${item.price}, '${item.img}')">+</button>
+              </div>
+            </div>
+          `;
+          itemsDiv.appendChild(itemEl);
+        });
+        menuContent.appendChild(catDiv);
+      });
+    }
+
+    function addToCart(item, price, img) {
+      const existing = cart.find(i => i.item === item);
+      if (existing) {
+        existing.qty++;
+      } else {
+        cart.push({ item, price, img, qty: 1 });
+      }
+      updateCart();
+    }
+
+    function decreaseCart(item, price, img) {
+      const existing = cart.find(i => i.item === item);
+      if (existing && existing.qty > 1) {
+        existing.qty--;
+      } else {
+        cart = cart.filter(i => i.item !== item);
+      }
+      updateCart();
+    }
+
+    function updateCart() {
+      const cartItems = document.getElementById("cart-items");
+      cartItems.innerHTML = "";
+      total = 0;
+      cart.forEach(i => {
+        total += i.price * i.qty;
+        const el = document.createElement("div");
+        el.classList.add("cart-item");
+        el.innerHTML = `
+          <img src="${i.img}" width="50" height="50" style="border-radius:8px;object-fit:cover;margin-right:10px;">
+          <span>${i.item} × ${i.qty}</span>
+          <span>₹${i.price * i.qty}</span>
+        `;
+        cartItems.appendChild(el);
+        document.getElementById(`qty-${i.item.replace(/\s/g, '')}`).textContent = i.qty;
+      });
+      document.getElementById("total").textContent = total;
+      document.getElementById("cart-count").textContent = cart.length;
+    }
+
+    function toggleCart() {
+      document.getElementById("cart-modal").classList.toggle("active");
+    }
+
+    function showAddress() {
+      toggleCart();
+      showScreen("address-screen");
+    }
+
+    function showPayment() {
+      customer.name = document.getElementById("name").value;
+      customer.address = document.getElementById("address").value;
+      customer.area = document.getElementById("area").value;
+      if (!customer.name || !customer.address || !customer.area) {
+        alert("Please fill all fields");
+        return;
+      }
+      document.getElementById("payment-total").textContent = total;
+      showScreen("payment-screen");
+    }
+
+    function selectMethod(el) {
+      document.querySelectorAll(".method").forEach(m => m.classList.remove("active"));
+      el.classList.add("active");
+    }
+
+    function showOrderSummary() {
+      const orderId = "PZ-" + Math.floor(1000 + Math.random() * 9000);
+      document.getElementById("order-id").textContent = orderId;
+
+      let summary = `<b>Order ID:</b> ${orderId}<br>`;
+      summary += `<b>Name:</b> ${customer.name}<br>`;
+      summary += `<b>Area:</b> ${customer.area}<br>`;
+      summary += `<b>Items:</b><br>`;
+      cart.forEach(i => {
+        summary += `• ${i.item} × ${i.qty} = ₹${i.price * i.qty}<br>`;
+      });
+      summary += `<b>Total: ₹${total}</b><br>`;
+      document.getElementById("summary-details").innerHTML = summary;
+
+      // Send to WhatsApp
+      const msg = encodeURIComponent(`
+🔥 *New Order on Pepperz* 🔥
+ID: ${orderId}
+Name: ${customer.name}
+Contact: ${customer.contact}
+Area: ${customer.area}
+Address: ${customer.address}
+
+${cart.map(i => `• ${i.item} × ${i.qty}`).join('\n')}
+Total: ₹${total}
+
+Time: ${new Date().toLocaleString()}
+      `);
+      const phone = "919876543210"; // 📞 यहां आपका नंबर डालें
+      setTimeout(() => {
+        window.open(`https://wa.me/${phone}?text=${msg}`, "_blank");
+      }, 1000);
+
+      showScreen("order-summary");
+    }
+
+    function restartApp() {
+      cart = [];
+      updateCart();
+      showScreen("login-screen");
+    }
+
+    // Initialize
+    function showMenu() {
+      showScreen("menu-screen");
+      loadMenu();
+    }
+  </script>
+
+</body>
+</html>
